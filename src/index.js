@@ -21,34 +21,34 @@ document.addEventListener("DOMContentLoaded", () => {
 function createNewToy(event) {
   event.preventDefault()
   console.log(event)
-  let list = []
   fetch(toyUrl)
     .then(response => response.json())
     .then(data => { 
-      list = data 
-      list.push({
-        "id": list.length + 1,
-        "name": document.getElementsByName("name")[0].textContent,
-        "image": document.getElementsByName("image")[0].textContent,
+      const formData = {
+        "id": data.length + 1,
+        "name": document.getElementsByName("name")[0].value,
+        "image": document.getElementsByName("image")[0].value,
         "likes": 0
-      })
+      }
+      console.log(formData)
       const configurationObject = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
         },
-        body: JSON.stringify(list),
+        body: JSON.stringify(formData),
       };
       let resp = fetch(toyUrl, configurationObject)
         .then(function (response) {
           return response.json();
         })
         .then(function (object) {
-          console.log("Toy added")
+          fetch(toyUrl)
+          .then(response => response.json())
+          .then(data => renderList(data))
         })
     })
-
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -60,6 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
 function renderList(toys) {
   console.log(toys)
   const toysDiv = document.getElementById("toy-collection");
+  while (toysDiv.firstChild) {
+      toysDiv.removeChild(toysDiv.firstChild);
+  }
   for (const index in toys) {
     const toy = toys[index]
     let div = document.createElement("div")
