@@ -20,17 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function createNewToy(event) {
   event.preventDefault()
-  console.log(event)
   fetch(toyUrl)
     .then(response => response.json())
-    .then(data => { 
+    .then(data => {
       const formData = {
         "id": data.length + 1,
         "name": document.getElementsByName("name")[0].value,
         "image": document.getElementsByName("image")[0].value,
         "likes": 0
       }
-      console.log(formData)
       const configurationObject = {
         method: "POST",
         headers: {
@@ -45,8 +43,8 @@ function createNewToy(event) {
         })
         .then(function (object) {
           fetch(toyUrl)
-          .then(response => response.json())
-          .then(data => renderList(data))
+            .then(response => response.json())
+            .then(data => renderList(data))
         })
     })
 }
@@ -61,7 +59,7 @@ function renderList(toys) {
   console.log(toys)
   const toysDiv = document.getElementById("toy-collection");
   while (toysDiv.firstChild) {
-      toysDiv.removeChild(toysDiv.firstChild);
+    toysDiv.removeChild(toysDiv.firstChild);
   }
   for (const index in toys) {
     const toy = toys[index]
@@ -85,8 +83,36 @@ function renderList(toys) {
     likeButton.className = "like-btn"
     likeButton.innerHTML = "Like ❤️"
     likeButton.id = toy.id
-    //likeButton.addEventListener("click", Like)
+    likeButton.addEventListener("click", like)
     div.appendChild(likeButton)
     toysDiv.appendChild(div);
   }
+}
+
+function like(event) {
+  event.preventDefault()
+  const id = event.srcElement.id
+  console.log(event)
+  
+  const formData = {
+    "likes": parseInt(event.srcElement.parentElement.children[2].innerHTML) + 1
+  }
+  const configurationObject = {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+    body: JSON.stringify(formData),
+  };
+  let resp = fetch(toyUrl + id, configurationObject)
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (object) {
+      console.log(object)
+      fetch(toyUrl)
+        .then(response => response.json())
+        .then(data => renderList(data))
+    })
 }
